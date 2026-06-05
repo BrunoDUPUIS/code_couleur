@@ -3,8 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Colorateur de Sons - Vue.js</title>
+    <title>Colorateur de Sons - Calligraphie Attachée</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- Importation de polices calligraphiques attachées -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Kaushan+Script&family=Satisfy&family=Pacifico&family=Shadows+Into+Light&family=Handlee&display=swap"
+      rel="stylesheet"
+    />
     <style>
       * {
         margin: 0;
@@ -57,7 +62,7 @@
         border: 2px solid #dee2e6;
         border-radius: 10px;
         resize: vertical;
-        font-family: monospace;
+        font-family: "Courier New", monospace;
         transition: border-color 0.3s;
       }
 
@@ -77,16 +82,25 @@
         font-weight: bold;
         margin-bottom: 15px;
         color: #2c3e50;
+        font-family: "Segoe UI", sans-serif;
       }
 
       .output-content {
         background: #f8f9fa;
-        padding: 20px;
+        padding: 30px;
         border-radius: 10px;
         min-height: 150px;
-        font-size: 18px;
-        line-height: 1.6;
-        font-family: monospace;
+        font-size: 32px;
+        line-height: 1.8;
+        /* Polices calligraphiques ATTACHÉES (les lettres se lient) */
+        font-family:
+          "Dancing Script", "Caveat", "Kaushan Script", "Pacifico", "Satisfy",
+          "Shadows Into Light", "Handlee", "cursive";
+        font-weight: 500;
+        letter-spacing: 0px;
+        font-style: normal;
+        font-kerning: normal;
+        font-variant-ligatures: normal;
       }
 
       .rules-section {
@@ -100,6 +114,7 @@
         font-weight: bold;
         margin-bottom: 10px;
         color: #2c3e50;
+        font-family: "Segoe UI", sans-serif;
       }
 
       .rule-item {
@@ -128,6 +143,7 @@
         border-radius: 5px;
         font-size: 14px;
         color: #495057;
+        font-family: "Segoe UI", sans-serif;
       }
 
       .print-btn {
@@ -141,6 +157,7 @@
         font-size: 16px;
         font-weight: bold;
         transition: transform 0.2s;
+        font-family: "Segoe UI", sans-serif;
       }
 
       .print-btn:hover {
@@ -173,7 +190,7 @@
       @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateY(5px);
         }
         to {
           opacity: 1;
@@ -181,8 +198,23 @@
         }
       }
 
+      /* Les lettres colorées n'ont PAS de background ajouté */
       .output-content span {
         animation: fadeIn 0.3s ease-out;
+        font-family: inherit;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        /* Pas de background, pas de padding, pas de border-radius */
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: inline;
+        /* Pour garder l'attachement des lettres */
+        letter-spacing: 0px;
+      }
+
+      .output-content span:hover {
+        text-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
       }
 
       /* Styles pour l'impression */
@@ -209,14 +241,26 @@
         .output-content {
           background: white;
           padding: 0;
+          font-family: "Dancing Script", "Caveat", "cursive" !important;
+          font-size: 28px !important;
         }
 
         .output-content span {
-          background: none !important;
+          background: transparent !important;
           padding: 0 !important;
           print-color-adjust: exact;
           -webkit-print-color-adjust: exact;
+          font-family: inherit !important;
         }
+      }
+
+      .font-note {
+        font-size: 11px;
+        text-align: center;
+        margin-top: 10px;
+        color: #6c757d;
+        font-family: "Segoe UI", sans-serif;
+        font-style: italic;
       }
     </style>
   </head>
@@ -224,10 +268,10 @@
     <div id="app">
       <div class="container">
         <div class="header">
-          <h1>🎨 Colorateur de Sons</h1>
+          <h1>✍️ Colorateur de Sons - Calligraphie Attachée</h1>
           <p>
-            Écrivez votre texte et les sons spécifiques seront automatiquement
-            colorés
+            Écrivez votre texte et les sons seront colorés avec une belle
+            écriture cursive attachée
           </p>
         </div>
 
@@ -243,10 +287,16 @@
           <button class="print-btn" @click="printResult" v-if="inputText">
             🖨️ Imprimer le résultat
           </button>
+          <div class="font-note">
+            ✍️ Police calligraphique attachée - Les lettres sont reliées entre
+            elles
+          </div>
         </div>
 
         <div class="output-section">
-          <div class="output-title">✨ Résultat coloré :</div>
+          <div class="output-title">
+            ✨ Résultat coloré (écriture attachée) :
+          </div>
           <div class="output-content" v-html="coloredText"></div>
           <div class="stats" v-if="inputText">
             📝 {{ inputText.length }} caractères | 🎨 {{ colorCount }}
@@ -288,6 +338,7 @@
             { sound: "est", letter: "est", color: "#FFA09C" }, // Saumon
             { sound: "ou", letter: "ou", color: "#FF9800" }, // Rose
             { sound: "an", letter: "an", color: "#4CAF50" }, // Vert foncé
+            { sound: "en", letter: "en", color: "#4CAF50" }, // Vert foncé
             { sound: "in", letter: "in", color: "#FF6B6B" }, // Rouge clair
             { sound: "on", letter: "on", color: "#FFE082" }, // Jaune clair
             { sound: "au", letter: "au", color: "#FF9800" }, // Orange
@@ -304,7 +355,7 @@
         computed: {
           coloredText() {
             if (!this.inputText)
-              return '<span style="color: #999;">Votre texte coloré apparaîtra ici...</span>';
+              return '<span style="color: #999; font-family: inherit;">Votre texte coloré apparaîtra ici...</span>';
             return this.processTextWithColors(this.inputText);
           },
           colorCount() {
@@ -361,8 +412,8 @@
                 if (i + ruleLength <= text.length) {
                   const substring = text.substr(i, ruleLength);
                   if (substring.toLowerCase() === rule.letter.toLowerCase()) {
-                    // Colorer le son complet
-                    result += `<span style="color: ${rule.color}; font-weight: bold; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px;">${substring}</span>`;
+                    // Lettres colorées SANS background, SANS padding, SANS effets supplémentaires
+                    result += `<span style="color: ${rule.color}; font-weight: 600;">${substring}</span>`;
                     i += ruleLength;
                     matched = true;
                     break;
