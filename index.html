@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colorateur de Sons - Vue.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .input-section {
+        padding: 30px;
+        background: #f8f9fa;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        resize: vertical;
+        font-family: monospace;
+        transition: border-color 0.3s;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .output-section {
+        padding: 30px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .output-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .output-content {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        min-height: 150px;
+        font-size: 18px;
+        line-height: 1.6;
+        font-family: monospace;
+      }
+
+      .rules-section {
+        padding: 20px 30px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .rules-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      .rule-item {
+        display: inline-block;
+        margin: 5px 10px 5px 0;
+        padding: 5px 10px;
+        background: white;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: monospace;
+      }
+
+      .color-preview {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+        margin-left: 5px;
+        vertical-align: middle;
+      }
+
+      .stats {
+        margin-top: 15px;
+        padding: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #495057;
+      }
+
+      .print-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+
+      .print-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .footer {
+        background: #2c3e50;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        border-top: 1px solid #34495e;
+      }
+
+      .footer p {
+        margin: 5px 0;
+      }
+
+      .footer .copyright {
+        opacity: 0.8;
+        font-size: 12px;
+      }
+
+      .footer .author {
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .output-content span {
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      /* Styles pour l'impression */
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+          margin: 0;
+        }
+
+        .input-section,
+        .rules-section,
+        .print-btn,
+        textarea,
+        .stats,
+        .footer {
+          display: none !important;
+        }
+
+        .output-section {
+          padding: 20px;
+        }
+
+        .output-content {
+          background: white;
+          padding: 0;
+        }
+
+        .output-content span {
+          background: none !important;
+          padding: 0 !important;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <div class="header">
+          <h1>🎨 Colorateur de Sons</h1>
+          <p>
+            Écrivez votre texte et les sons spécifiques seront automatiquement
+            colorés
+          </p>
+        </div>
+
+        <div class="input-section">
+          <textarea
+            v-model="inputText"
+            placeholder="Écrivez votre texte ici...&#10;"
+            rows="4"
+            @input="processText"
+          >
+          </textarea>
+
+          <button class="print-btn" @click="printResult" v-if="inputText">
+            🖨️ Imprimer le résultat
+          </button>
+        </div>
+
+        <div class="output-section">
+          <div class="output-title">✨ Résultat coloré :</div>
+          <div class="output-content" v-html="coloredText"></div>
+          <div class="stats" v-if="inputText">
+            📝 {{ inputText.length }} caractères | 🎨 {{ colorCount }}
+            colorations
+          </div>
+        </div>
+
+        <div class="rules-section">
+          <div class="rules-title">🎵 Règles de coloration :</div>
+          <div class="rule-item" v-for="rule in rules" :key="rule.sound">
+            "{{ rule.sound }}" →
+            <span style="color: rule.color">{{ rule.letter }}</span>
+            <div
+              class="color-preview"
+              :style="{backgroundColor: rule.color}"
+            ></div>
+          </div>
+          <div class="stats" style="margin-top: 10px; background: #fff3cd">
+            💡 Astuce : Les sons longs (comme "ai", "ou") sont prioritaires sur
+            les lettres seules
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>© 2026 - Tous droits réservés</p>
+          <p>Réalisation par <span class="author">Bruno DUPUIS</span></p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data: {
+          inputText: "",
+          rules: [
+            // Sons longs (prioritaires)
+            { sound: "ai", letter: "ai", color: "#FFA09C" }, // Saumon
+            { sound: "est", letter: "est", color: "#FFA09C" }, // Saumon
+            { sound: "ou", letter: "ou", color: "#FF9800" }, // Rose
+            { sound: "an", letter: "an", color: "#4CAF50" }, // Vert foncé
+            { sound: "in", letter: "in", color: "#FF6B6B" }, // Rouge clair
+            { sound: "on", letter: "on", color: "#FFE082" }, // Jaune clair
+            { sound: "au", letter: "au", color: "#FF9800" }, // Orange
+            { sound: "eu", letter: "eu", color: "#9C27B0" }, // Violet
+            { sound: "oi", letter: "oi", color: "#00BCD4" }, // Cyan
+            { sound: "or", letter: "or", color: "#FF9800" }, // Orange
+            // Lettres seules
+            { sound: "a", letter: "a", color: "#FF4444" }, // Rouge
+            { sound: "e", letter: "e", color: "#44FF44" }, // Vert
+            { sound: "i", letter: "i", color: "#FFD700" }, // Jaune
+            { sound: "u", letter: "u", color: "#9C27B0" }, // Violet
+          ],
+        },
+        computed: {
+          coloredText() {
+            if (!this.inputText)
+              return '<span style="color: #999;">Votre texte coloré apparaîtra ici...</span>';
+            return this.processTextWithColors(this.inputText);
+          },
+          colorCount() {
+            let count = 0;
+            let i = 0;
+            const text = this.inputText.toLowerCase();
+            const sortedRules = [...this.rules].sort(
+              (a, b) => b.letter.length - a.letter.length,
+            );
+
+            while (i < text.length) {
+              let matched = false;
+              for (let rule of sortedRules) {
+                const ruleLength = rule.letter.length;
+                if (i + ruleLength <= text.length) {
+                  const substring = text.substr(i, ruleLength);
+                  if (substring === rule.letter.toLowerCase()) {
+                    count++;
+                    i += ruleLength;
+                    matched = true;
+                    break;
+                  }
+                }
+              }
+              if (!matched) {
+                i++;
+              }
+            }
+            return count;
+          },
+        },
+        methods: {
+          processText() {
+            this.$forceUpdate();
+          },
+
+          processTextWithColors(text) {
+            if (!text) return "";
+
+            let result = "";
+            let i = 0;
+
+            // Trier les règles par longueur décroissante pour matcher les sons longs d'abord
+            const sortedRules = [...this.rules].sort(
+              (a, b) => b.letter.length - a.letter.length,
+            );
+
+            while (i < text.length) {
+              let matched = false;
+
+              // Chercher d'abord les sons les plus longs
+              for (let rule of sortedRules) {
+                const ruleLength = rule.letter.length;
+                if (i + ruleLength <= text.length) {
+                  const substring = text.substr(i, ruleLength);
+                  if (substring.toLowerCase() === rule.letter.toLowerCase()) {
+                    // Colorer le son complet
+                    result += `<span style="color: ${rule.color}; font-weight: bold; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px;">${substring}</span>`;
+                    i += ruleLength;
+                    matched = true;
+                    break;
+                  }
+                }
+              }
+
+              // Si aucun son trouvé, afficher le caractère normal
+              if (!matched) {
+                result += text[i];
+                i++;
+              }
+            }
+
+            return result;
+          },
+
+          printResult() {
+            window.print();
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
